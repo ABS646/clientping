@@ -1,0 +1,15 @@
+name: ClientPing Reminder Cron
+
+on:
+  schedule:
+    # Runs at minute 0 of every hour (e.g., 1:00, 2:00, 3:00)
+    - cron: '0 * * * *'
+  workflow_dispatch: # This lets you run it manually to test
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hit the reminder API
+        run: |
+          curl -X GET "https://clientping-mjly-g26ucvyzt-abs-bbb7.vercel.app"
