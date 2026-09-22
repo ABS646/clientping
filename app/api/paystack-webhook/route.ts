@@ -6,7 +6,6 @@ export async function POST(req: Request) {
   const body = await req.text()
   const signature = req.headers.get('x-paystack-signature')
 
-  // 1. Verify the request actually came from Paystack (security)
   const hash = crypto
     .createHmac('sha512', process.env.PAYSTACK_SECRET_KEY!)
     .update(body)
@@ -18,7 +17,6 @@ export async function POST(req: Request) {
 
   const event = JSON.parse(body)
 
-  // 2. If payment was successful, upgrade the user
   if (event.event === 'charge.success') {
     const email = event.data.customer.email
     const supabase = createAdminClient()
@@ -36,6 +34,5 @@ export async function POST(req: Request) {
     console.log(`✅ Upgraded ${email} to paid plan`)
   }
 
-  // 3. Always return 200 so Paystack knows we received it
   return NextResponse.json({ received: true })
 }
