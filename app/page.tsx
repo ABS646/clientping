@@ -201,10 +201,10 @@ export default function Home() {
           Reach out anytime. We reply within 24 hours.
         </p>
         <a
-          href="mailto:hello@tryclientping.com"
+          href="mailto:tryclientping@gmail.com"
           className="inline-block bg-black text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800"
         >
-          hello@tryclientping.com
+          tryclienping@gmail.com
         </a>
       </section>
 
@@ -213,7 +213,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
           <div>© {new Date().getFullYear()} ClientPing. All rights reserved.</div>
           <div className="flex gap-4">
-            <a href="mailto:hello@tryclientping.com" className="hover:text-black">
+            <a href="mailto:tryclientping@gmail.com" className="hover:text-black">
               Contact
             </a>
             <Link href="/login" className="hover:text-black">

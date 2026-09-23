@@ -103,7 +103,7 @@ export default function LoginPage() {
 
         <p className="text-center text-xs text-gray-400 mt-6">
           © {new Date().getFullYear()} ClientPing ·{' '}
-          <a href="mailto:hello@tryclientping.com" className="hover:text-gray-600">
+          <a href="mailto:tryclientping@gmail.com" className="hover:text-gray-600">
             Contact
           </a>
         </p>
