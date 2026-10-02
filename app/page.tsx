@@ -2,6 +2,9 @@ import Link from 'next/link'
 
 export default function Home() {
   return (
+    <div className="bg-blue-600 text-white text-center py-2 px-4 text-sm font-medium">
+        First 10 users get 3 months of Pro FREE email tryclientping@gmail.com to claim
+    </div>
     <main className="min-h-screen bg-white">
       {/* Nav */}
       <nav className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
