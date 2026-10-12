@@ -12,4 +12,4 @@ jobs:
     steps:
       - name: Hit the reminder API
         run: |
-          curl -X GET "https://clientping-mjly-g26ucvyzt-abs-bbb7.vercel.app"
+          curl -X GET "https://getduenudge.com/api/send-reminders"
