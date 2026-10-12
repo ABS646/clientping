@@ -11,7 +11,7 @@ export default function Home() {
         {/* Nav */}
         <nav className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <img src="/logo-icon.png" alt="ClientPing" className="w-9 h-9" />
+            <img src="/logo-icon.png" alt="duenudge" className="w-9 h-9" />
             <span className="font-bold text-xl tracking-tight">
               Client<span className="text-blue-600">Ping</span>
             </span>
@@ -40,7 +40,7 @@ export default function Home() {
             <span className="text-blue-600">Get paid faster.</span>
           </h1>
           <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">
-            ClientPing automatically follows up with your clients by email until
+            duenudge automatically follows up with your clients by email until
             they pay, reply, or approve. No more awkward "just checking in"
             messages.
           </p>
@@ -216,7 +216,7 @@ export default function Home() {
         {/* Footer */}
         <footer className="border-t">
           <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
-            <div>© {new Date().getFullYear()} ClientPing. All rights reserved.</div>
+            <div>© {new Date().getFullYear()} due nudge. All rights reserved.</div>
             <div className="flex gap-4">
               <a href="mailto:tryclientping@gmail.com" className="hover:text-black">
                 Contact

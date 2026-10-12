@@ -12,7 +12,7 @@ export default function PaystackButton({
   // Set this to 'true' once Paystack approves your account and you've
   // swapped in your live keys. Until then, keep it 'false' so users
   // can't accidentally "pay" with test mode.
-  const PAYSTACK_LIVE = false
+  const PAYSTACK_LIVE = true
 
   const config = {
     reference: new Date().getTime().toString(),

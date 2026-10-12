@@ -161,7 +161,7 @@ export default function DashboardPage() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `clientping-paid-${new Date().toISOString().split('T')[0]}.csv`
+    a.download = `clientpaid-paid-${new Date().toISOString().split('T')[0]}.csv`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -184,8 +184,8 @@ export default function DashboardPage() {
       <header className="bg-white border-b">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <img src="/logo-icon.png" alt="ClientPing" className="w-8 h-8" />
-            <span className="font-bold text-lg hidden sm:inline">ClientPing</span>
+            <img src="/logo-icon.png" alt="duenudge" className="w-8 h-8" />
+            <span className="font-bold text-lg hidden sm:inline">duenudge</span>
           </Link>
           <div className="flex items-center gap-3">
             <Link

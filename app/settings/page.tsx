@@ -141,7 +141,7 @@ export default function SettingsPage() {
       <header className="bg-white border-b">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/dashboard" className="text-xl font-bold">
-            ClientPing
+            duenudge
           </Link>
           <Link
             href="/dashboard"

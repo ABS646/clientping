@@ -59,7 +59,7 @@ export async function GET() {
     try {
       // Send the email
       await resend.emails.send({
-        from: 'ClientPing <onboarding@resend.dev>', // Resend's free testing sender
+        from: 'duenudge <onboarding@resend.dev>', // Resend's free testing sender
         to: client.email,
         subject: subject,
         text: body,

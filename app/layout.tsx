@@ -5,9 +5,9 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'ClientPing — Stop chasing clients. Get paid faster.',
+  title: 'duenudge — Stop chasing clients. Get paid faster.',
   description:
-    'ClientPing automatically follows up with your clients by email until they pay, reply, or approve.',
+    'duenudge automatically follows up with your clients by email until they pay, reply, or approve.',
 }
 
 export default function RootLayout({
