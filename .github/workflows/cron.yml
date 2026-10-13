@@ -1,4 +1,4 @@
-name: ClientPing Reminder Cron
+name: duenudge Reminder Cron
 
 on:
   schedule:
