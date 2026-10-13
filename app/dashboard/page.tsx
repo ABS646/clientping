@@ -184,8 +184,9 @@ export default function DashboardPage() {
       <header className="bg-white border-b">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <img src="/logo-icon.png" alt="duenudge" className="w-8 h-8" />
-            <span className="font-bold text-lg hidden sm:inline">duenudge</span>
+            <span className="font-bold text-xl trackling-tight">
+              due<span className="text-blue-600">Nudge</span>
+              </span>
           </Link>
           <div className="flex items-center gap-3">
             <Link

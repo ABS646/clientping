@@ -11,9 +11,8 @@ export default function Home() {
         {/* Nav */}
         <nav className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <img src="/logo-icon.png" alt="duenudge" className="w-9 h-9" />
             <span className="font-bold text-xl tracking-tight">
-              Client<span className="text-blue-600">Ping</span>
+              due<span className="text-blue-600">nudge</span>
             </span>
           </Link>
           <div className="flex items-center gap-4">

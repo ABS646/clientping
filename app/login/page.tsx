@@ -37,10 +37,9 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md">
         {/* Logo */}
-        <Link href="/" className="flex items-center justify-center gap-2 mb-8">
-          <img src="/logo-icon.png" alt="duenudge" className="w-10 h-10" />
+        <Link href="/" className="flex items-center gap-2">
           <span className="font-bold text-2xl tracking-tight">
-            Client<span className="text-blue-600">Ping</span>
+            due<span className="text-blue-600">nudge</span>
           </span>
         </Link>
 
