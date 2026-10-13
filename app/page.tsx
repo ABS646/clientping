@@ -1,6 +1,29 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
 export default function Home() {
+  const [currency, setCurrency] = useState<'NGN' | 'USD'>('NGN')
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch('https://ipapi.co/json/')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.country_code && data.country_code !== 'NG') {
+          setCurrency('USD')
+        }
+      })
+      .catch(() => {
+        // Default to NGN if geo lookup fails
+      })
+      .finally(() => setLoading(false))
+  }, [])
+
+  const price = currency === 'NGN' ? '₦3,500' : '$15'
+  const freePrice = currency === 'NGN' ? '₦0' : '$0'
+
   return (
     <div>
       <div className="bg-blue-600 text-white text-center py-2 px-4 text-sm font-medium">
@@ -12,7 +35,7 @@ export default function Home() {
         <nav className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <span className="font-bold text-xl tracking-tight">
-              due<span className="text-blue-600">nudge</span>
+              Due<span className="text-blue-600">Nudge</span>
             </span>
           </Link>
           <div className="flex items-center gap-4">
@@ -38,9 +61,12 @@ export default function Home() {
             <br />
             <span className="text-blue-600">Get paid faster.</span>
           </h1>
+          <p className="mt-4 text-sm text-gray-500 italic">
+            Built by a freelancer who was tired of writing "just following up..."
+          </p>
           <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">
-            duenudge automatically follows up with your clients by email until
-            they pay, reply, or approve. No more awkward "just checking in"
+            DueNudge automatically follows up with your clients until they pay,
+            approve, reply, or send the file. No more awkward "just checking in"
             messages.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
@@ -58,14 +84,14 @@ export default function Home() {
             </a>
           </div>
           <p className="mt-4 text-sm text-gray-400">
-            Free for 3 clients · No credit card needed
+            Free for 5 clients · No credit card needed
           </p>
         </section>
 
         {/* Features */}
         <section className="max-w-5xl mx-auto px-6 pb-20">
           <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
-            Everything you need to stop chasing payments
+            Everything you need to stop chasing clients
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
             {[
@@ -75,9 +101,9 @@ export default function Home() {
                   'Set it once and forget it. We send polite follow-up emails every few days until your client responds.',
               },
               {
-                title: 'Know who owes you',
+                title: 'Payments, approvals, files & more',
                 description:
-                  'A live dashboard shows exactly how much money is outstanding across all your clients.',
+                  "Track anything you're waiting for — payments, approvals, files, replies, or contract signatures.",
               },
               {
                 title: 'Professional branding',
@@ -106,12 +132,12 @@ export default function Home() {
             {/* Free */}
             <div className="border rounded-2xl p-8">
               <h3 className="text-xl font-bold mb-2">Free</h3>
-              <div className="text-4xl font-bold mb-1">₦0</div>
+              <div className="text-4xl font-bold mb-1">{freePrice}</div>
               <p className="text-gray-500 text-sm mb-6">Forever</p>
               <ul className="space-y-3 mb-8 text-sm">
                 <li className="flex items-start gap-2">
                   <span className="text-green-600">✓</span>
-                  Track up to 3 clients
+                  Track up to 5 clients
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-green-600">✓</span>
@@ -136,7 +162,9 @@ export default function Home() {
                 Most popular
               </div>
               <h3 className="text-xl font-bold mb-2">Pro</h3>
-              <div className="text-4xl font-bold mb-1">₦3,500</div>
+              <div className="text-4xl font-bold mb-1">
+                {loading ? '...' : price}
+              </div>
               <p className="text-gray-500 text-sm mb-6">per month</p>
               <ul className="space-y-3 mb-8 text-sm">
                 <li className="flex items-start gap-2">
@@ -149,19 +177,33 @@ export default function Home() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-green-600">✓</span>
-                  Logo + business name on invoices
+                  Logo + business name on reminders
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-green-600">✓</span>
                   Priority support
                 </li>
               </ul>
-              <Link
-                href="/login"
-                className="block text-center bg-blue-600 text-white rounded-lg py-3 font-medium hover:bg-blue-700"
-              >
-                Start free trial
-              </Link>
+              {currency === 'NGN' ? (
+                <Link
+                  href="/login"
+                  className="block text-center bg-blue-600 text-white rounded-lg py-3 font-medium hover:bg-blue-700"
+                >
+                  Start free trial
+                </Link>
+              ) : (
+                <a
+                  href="mailto:tryclientping@gmail.com?subject=DueNudge%20Beta%20Access&body=Hi%2C%20I'd%20like%20early%20access%20to%20DueNudge%20Pro%20during%20the%20beta.%20Please%20add%20me."
+                  className="block text-center bg-blue-600 text-white rounded-lg py-3 font-medium hover:bg-blue-700"
+                >
+                  Get free beta access
+                </a>
+              )}
+              {currency === 'USD' && (
+                <p className="text-xs text-gray-500 mt-3 text-center">
+                  Pro launches soon. Email us for free access during the beta.
+                </p>
+              )}
             </div>
           </div>
         </section>
@@ -215,7 +257,7 @@ export default function Home() {
         {/* Footer */}
         <footer className="border-t">
           <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
-            <div>© {new Date().getFullYear()} due nudge. All rights reserved.</div>
+            <div>© {new Date().getFullYear()} DueNudge. All rights reserved.</div>
             <div className="flex gap-4">
               <a href="mailto:tryclientping@gmail.com" className="hover:text-black">
                 Contact
