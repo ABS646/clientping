@@ -1,8 +1,8 @@
-name: duenudge Reminder Cron
+name: DueNudge Reminder Cron
 
 on:
   schedule:
-    # Runs at minute 0 of every hour (e.g., 1:00, 2:00, 3:00)
+    # Runs at minute 0 of every hour
     - cron: '0 * * * *'
   workflow_dispatch: # This lets you run it manually to test
 
@@ -12,4 +12,4 @@ jobs:
     steps:
       - name: Hit the reminder API
         run: |
-          curl -X GET "https://getduenudge.com/api/send-reminders"
+          curl -L -X GET "https://getduenudge.com/api/send-reminders"
