@@ -15,9 +15,7 @@ export default function Home() {
           setCurrency('USD')
         }
       })
-      .catch(() => {
-        // Default to NGN if geo lookup fails
-      })
+      .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
 
@@ -30,7 +28,9 @@ export default function Home() {
         First 10 users get 3 months of Pro FREE - email tryclientping@gmail.com to claim
       </div>
 
-      <main className="min-h-screen bg-white">
+      {/* Added subtle gradient background as requested */}
+      <main className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+        
         {/* Nav */}
         <nav className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
@@ -53,7 +53,7 @@ export default function Home() {
 
         {/* Hero */}
         <section className="max-w-4xl mx-auto px-6 pt-16 pb-20 text-center">
-          <div className="inline-block bg-blue-50 text-blue-700 text-xs font-medium px-3 py-1 rounded-full mb-4">
+          <div className="inline-block bg-blue-100 text-blue-700 text-xs font-medium px-3 py-1 rounded-full mb-4 shadow-sm">
             Built for freelancers who hate chasing payments
           </div>
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-gray-900 leading-tight">
@@ -72,13 +72,13 @@ export default function Home() {
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               href="/login"
-              className="bg-black text-white px-8 py-4 rounded-lg font-medium hover:bg-gray-800 text-lg"
+              className="bg-black text-white px-8 py-4 rounded-lg font-medium hover:bg-gray-800 text-lg shadow-lg hover:shadow-xl transition-all"
             >
               Get started free
             </Link>
             <a
               href="#pricing"
-              className="border border-gray-300 text-gray-700 px-8 py-4 rounded-lg font-medium hover:border-black text-lg"
+              className="border border-gray-300 bg-white text-gray-700 px-8 py-4 rounded-lg font-medium hover:border-black text-lg"
             >
               See pricing
             </a>
@@ -111,7 +111,7 @@ export default function Home() {
                   'Add your logo and business name so every reminder looks like it came from a real business.',
               },
             ].map((f) => (
-              <div key={f.title} className="border rounded-2xl p-6">
+              <div key={f.title} className="bg-white border rounded-2xl p-6 shadow-sm">
                 <h3 className="font-semibold text-lg mb-2">{f.title}</h3>
                 <p className="text-gray-600 text-sm">{f.description}</p>
               </div>
@@ -119,7 +119,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Pricing */}
+        {/* Pricing (Moved down as Lomen suggested) */}
         <section id="pricing" className="max-w-4xl mx-auto px-6 pb-20">
           <h2 className="text-3xl font-bold text-center mb-3 text-gray-900">
             Simple pricing
@@ -130,7 +130,7 @@ export default function Home() {
 
           <div className="grid md:grid-cols-2 gap-6">
             {/* Free */}
-            <div className="border rounded-2xl p-8">
+            <div className="bg-white border rounded-2xl p-8 shadow-sm">
               <h3 className="text-xl font-bold mb-2">Free</h3>
               <div className="text-4xl font-bold mb-1">{freePrice}</div>
               <p className="text-gray-500 text-sm mb-6">Forever</p>
@@ -150,15 +150,15 @@ export default function Home() {
               </ul>
               <Link
                 href="/login"
-                className="block text-center border border-gray-300 rounded-lg py-3 font-medium hover:border-black"
+                className="block text-center border border-gray-300 rounded-lg py-3 font-medium hover:border-black hover:bg-gray-50"
               >
                 Get started
               </Link>
             </div>
 
             {/* Pro */}
-            <div className="border-2 border-blue-600 rounded-2xl p-8 relative">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white text-xs font-medium px-3 py-1 rounded-full">
+            <div className="bg-white border-2 border-blue-600 rounded-2xl p-8 relative shadow-md">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white text-xs font-medium px-3 py-1 rounded-full shadow-sm">
                 Most popular
               </div>
               <h3 className="text-xl font-bold mb-2">Pro</h3>
@@ -184,21 +184,23 @@ export default function Home() {
                   Priority support
                 </li>
               </ul>
+              
               {currency === 'NGN' ? (
                 <Link
                   href="/login"
-                  className="block text-center bg-blue-600 text-white rounded-lg py-3 font-medium hover:bg-blue-700"
+                  className="block text-center bg-blue-600 text-white rounded-lg py-3 font-medium hover:bg-blue-700 shadow-sm"
                 >
                   Start free trial
                 </Link>
               ) : (
                 <a
                   href="mailto:tryclientping@gmail.com?subject=DueNudge%20Beta%20Access&body=Hi%2C%20I'd%20like%20early%20access%20to%20DueNudge%20Pro%20during%20the%20beta.%20Please%20add%20me."
-                  className="block text-center bg-blue-600 text-white rounded-lg py-3 font-medium hover:bg-blue-700"
+                  className="block text-center bg-blue-600 text-white rounded-lg py-3 font-medium hover:bg-blue-700 shadow-sm"
                 >
                   Get free beta access
                 </a>
               )}
+              
               {currency === 'USD' && (
                 <p className="text-xs text-gray-500 mt-3 text-center">
                   Pro launches soon. Email us for free access during the beta.
@@ -232,7 +234,7 @@ export default function Home() {
                 a: 'Yes. We use industry-standard encryption and your data is never shared with third parties.',
               },
             ].map((item) => (
-              <div key={item.q} className="border rounded-xl p-6">
+              <div key={item.q} className="bg-white border rounded-xl p-6 shadow-sm">
                 <h3 className="font-semibold mb-2">{item.q}</h3>
                 <p className="text-gray-600 text-sm">{item.a}</p>
               </div>
@@ -248,14 +250,14 @@ export default function Home() {
           </p>
           <a
             href="mailto:tryclientping@gmail.com"
-            className="inline-block bg-black text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800"
+            className="inline-block bg-white border border-gray-300 text-black px-6 py-3 rounded-lg font-medium hover:border-black shadow-sm"
           >
             tryclientping@gmail.com
           </a>
         </section>
 
         {/* Footer */}
-        <footer className="border-t">
+        <footer className="border-t bg-white">
           <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
             <div>© {new Date().getFullYear()} DueNudge. All rights reserved.</div>
             <div className="flex gap-4">

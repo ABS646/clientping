@@ -13,33 +13,41 @@ export default function LoginPage() {
   const [mode, setMode] = useState<'login' | 'signup'>('login')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [message, setMessage] = useState('')
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError('')
+    setMessage('')
 
-    const { error } =
-      mode === 'login'
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password })
-
-    if (error) {
-      setError(error.message)
-      setLoading(false)
-      return
+    if (mode === 'login') {
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) {
+        setError(error.message)
+        setLoading(false)
+      } else {
+        router.push('/dashboard')
+      }
+    } else {
+      const { error } = await supabase.auth.signUp({ email, password })
+      if (error) {
+        setError(error.message)
+        setLoading(false)
+      } else {
+        setMessage('Account created! Please check your email to confirm your address.')
+        setLoading(false)
+        setMode('login')
+      }
     }
-
-    router.push('/dashboard')
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center justify-center gap-2 mb-8">
           <span className="font-bold text-2xl tracking-tight">
-            due<span className="text-blue-600">nudge</span>
+            Due<span className="text-blue-600">Nudge</span>
           </span>
         </Link>
 
@@ -56,7 +64,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="email"
-              placeholder="Email"
+              placeholder="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -72,40 +80,34 @@ export default function LoginPage() {
               className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-blue-600 text-gray-900 bg-white placeholder:text-gray-400"
             />
 
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {error && <p className="text-red-500 text-sm bg-red-50 p-2 rounded">{error}</p>}
+            {message && <p className="text-green-600 text-sm bg-green-50 p-2 rounded">{message}</p>}
 
             <button
               type="submit"
               disabled={loading}
               className="w-full bg-black text-white rounded-lg py-3 font-medium hover:bg-gray-800 disabled:opacity-50"
             >
-              {loading
-                ? 'Please wait...'
-                : mode === 'login'
-                  ? 'Log in'
-                  : 'Sign up'}
+              {loading ? 'Please wait...' : mode === 'login' ? 'Log in' : 'Sign up'}
             </button>
           </form>
 
-          <button
-            onClick={() => {
-              setMode(mode === 'login' ? 'signup' : 'login')
-              setError('')
-            }}
-            className="mt-4 text-sm text-gray-500 hover:text-black w-full text-center"
-          >
-            {mode === 'login'
-              ? "Don't have an account? Sign up"
-              : 'Already have an account? Log in'}
-          </button>
+          <div className="mt-6 pt-6 border-t border-gray-100 text-center">
+            <p className="text-sm text-gray-600 mb-2">
+              {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}
+            </p>
+            <button
+              onClick={() => {
+                setMode(mode === 'login' ? 'signup' : 'login')
+                setError('')
+                setMessage('')
+              }}
+              className="text-sm font-bold text-blue-600 hover:text-blue-800"
+            >
+              {mode === 'login' ? 'Go to Sign up' : 'Go to Log in'}
+            </button>
+          </div>
         </div>
-
-        <p className="text-center text-xs text-gray-400 mt-6">
-          © {new Date().getFullYear()} duenudge ·{' '}
-          <a href="mailto:tryclientping@gmail.com" className="hover:text-gray-600">
-            Contact
-          </a>
-        </p>
       </div>
     </div>
   )
