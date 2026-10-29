@@ -17,7 +17,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
-  )
+  <head>
+    <script defer data-site-id="959a82e6-a27e-47fc-a328-494fba7c8105" src="https://lomenanalytics.com/api/public/track.js"></script>
+  </head>
+  <body className={inter.className}>{children}</body>
+</html>
+)
 }
