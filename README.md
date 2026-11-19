@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DueNudge
 
-## Getting Started
+DueNudge helps service businesses collect booking deposits, remind customers before appointments, follow up after no-shows, and bring opted-in past customers back. The current booking MVP supports service listings, public booking requests, Nigeria/NGN Paystack subaccount settlement, owner time confirmation, appointment reminders, no-show tracking and rebooking, and email win-backs.
 
-First, run the development server:
+## Local development
 
 ```bash
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Create a local `.env.local` from the environment variable list below. Never commit secret values.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Database migration
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Before using the booking workspace, apply `supabase/migrations/20261119000000_booking_recovery.sql` to the Supabase project connected to this deployment. This migration creates business settings, services, customers, bookings, and message history with owner-scoped row-level security. Existing freelancer follow-up tables are intentionally left intact.
 
-## Learn More
+## Required deployment configuration
 
-To learn more about Next.js, take a look at the following resources:
+Configure these in the Vercel project:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY` (server-side only; never use a `NEXT_PUBLIC_` prefix)
+- `PAYSTACK_SECRET_KEY` (server-side only; use Paystack test credentials for testing)
+- `RESEND_API_KEY`
+- `RESEND_FROM` (optional override; use a sender domain verified in Resend before sending customer emails)
+- `NEXT_PUBLIC_APP_URL` (for example, `https://getduenudge.com`)
+- `CRON_SECRET` (a long random value used to authenticate the scheduled reminder endpoint)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Configure the Paystack webhook URL as `https://getduenudge.com/api/paystack-webhook` and enable the `charge.success` event. Customer booking deposits are initialized with the business’s Paystack subaccount, `percentage_charge: 0`, and `bearer: subaccount`, so DueNudge takes no percentage share and the business bears Paystack transaction fees. A business must explicitly verify its bank-account name and create its settlement subaccount before a deposit-required service can accept payment. DueNudge stores the verified account name, bank label, and subaccount code—not the raw bank account number.
 
-## Deploy on Vercel
+Each business must publish its own cancellation and refund terms before its deposit services can accept online payment. The terms the customer accepts are recorded with that booking. A paid deposit is routed to the business and is not automatically refunded by DueNudge; refund/cancellation handling is currently managed by the business through Paystack.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Scheduled email reminders and win-backs
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The repository’s hourly GitHub Actions workflow calls `/api/send-reminders`. Set the same secret value in both places:
+
+- Vercel environment variable: `CRON_SECRET`
+- GitHub repository Actions secret: `DUENUDGE_CRON_SECRET`
+
+The endpoint processes existing freelancer reminders, confirmed-booking reminders, one-time no-show rebooking emails after 24 hours (marketing opt-in required), and opted-in win-back email. Configure a Resend sender that is verified for the business’s email domain before enabling production sending.
+
+## Deployment
+
+The app is deployed on Vercel from GitHub. Merge the reviewed feature branch into the connected deployment branch to trigger production deployment. Apply the Supabase migration and configure the variables/webhook/cron secrets before enabling customer bookings or live payments. Test settlement with Paystack test-mode credentials first.

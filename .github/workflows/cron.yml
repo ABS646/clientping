@@ -11,5 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Hit the reminder API
+        env:
+          DUENUDGE_CRON_SECRET: ${{ secrets.DUENUDGE_CRON_SECRET }}
         run: |
-          curl -L -X GET "https://getduenudge.com/api/send-reminders"
+          test -n "$DUENUDGE_CRON_SECRET"
+          curl --fail --silent --show-error -L -H "Authorization: Bearer $DUENUDGE_CRON_SECRET" "https://getduenudge.com/api/send-reminders"

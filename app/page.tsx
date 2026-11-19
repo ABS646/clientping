@@ -1,276 +1,68 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useMemo, useState } from 'react'
+
+const industries = ['Salons & beauty','Clinics & dentists','Restaurants','Tailors','Photographers','Tutors & classes','Gyms & trainers','Home renovation']
 
 export default function Home() {
-  const [currency, setCurrency] = useState<'NGN' | 'USD'>('NGN')
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    fetch('https://ipapi.co/json/')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.country_code && data.country_code !== 'NG') {
-          setCurrency('USD')
-        }
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [])
-
-  const price = currency === 'NGN' ? '₦3,500' : '$15'
-  const freePrice = currency === 'NGN' ? '₦0' : '$0'
+  const [slotValue, setSlotValue] = useState('8000')
+  const [missedBookings, setMissedBookings] = useState('14')
+  const estimatedLoss = useMemo(() => Math.max(0, Number(slotValue) || 0) * Math.max(0, Number(missedBookings) || 0), [slotValue, missedBookings])
+  const formattedLoss = new Intl.NumberFormat('en-NG', { style:'currency', currency:'NGN', maximumFractionDigits:0 }).format(estimatedLoss)
 
   return (
-    <div>
-      <div className="bg-blue-600 text-white text-center py-2 px-4 text-sm font-medium">
-        First 10 users get 3 months of Pro FREE - email tryclientping@gmail.com to claim
-      </div>
+    <main className="min-h-screen overflow-hidden bg-[#f7f7f2] text-slate-950">
+      <div className="border-b border-emerald-950/10 bg-emerald-950 px-4 py-2 text-center text-xs font-medium tracking-wide text-emerald-50">For service businesses tired of losing time to no-shows and fake orders</div>
+      <header className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8">
+        <Link href="/" className="text-xl font-black tracking-tight">Due<span className="text-emerald-700">Nudge</span><span className="ml-2 align-middle text-[9px] font-bold uppercase tracking-[0.18em] text-slate-400">Bookings</span></Link>
+        <nav className="flex items-center gap-5 text-sm font-semibold"><a className="hidden text-slate-600 hover:text-slate-950 sm:block" href="#how-it-works">How it works</a><a className="hidden text-slate-600 hover:text-slate-950 sm:block" href="#businesses">Who it’s for</a><Link href="/login" className="text-slate-600 hover:text-slate-950">Log in</Link><Link href="/login" className="rounded-xl bg-slate-950 px-4 py-2.5 text-white hover:bg-emerald-800">Get started</Link></nav>
+      </header>
 
-      {/* Added subtle gradient background as requested */}
-      <main className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-        
-        {/* Nav */}
-        <nav className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="font-bold text-xl tracking-tight">
-              Due<span className="text-blue-600">Nudge</span>
-            </span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm text-gray-600 hover:text-black">
-              Log in
-            </Link>
-            <Link
-              href="/login"
-              className="text-sm bg-black text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-800"
-            >
-              Get started
-            </Link>
-          </div>
-        </nav>
-
-        {/* Hero */}
-        <section className="max-w-4xl mx-auto px-6 pt-16 pb-20 text-center">
-          <div className="inline-block bg-blue-100 text-blue-700 text-xs font-medium px-3 py-1 rounded-full mb-4 shadow-sm">
-            Built for freelancers who hate chasing payments
-          </div>
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-gray-900 leading-tight">
-            Stop chasing clients.
-            <br />
-            <span className="text-blue-600">Get paid faster.</span>
-          </h1>
-          <p className="mt-4 text-sm text-gray-500 italic">
-            Built by a freelancer who was tired of writing "just following up..."
-          </p>
-          <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">
-            DueNudge automatically follows up with your clients until they pay,
-            approve, reply, or send the file. No more awkward "just checking in"
-            messages.
-          </p>
-          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-            <Link
-              href="/login"
-              className="bg-black text-white px-8 py-4 rounded-lg font-medium hover:bg-gray-800 text-lg shadow-lg hover:shadow-xl transition-all"
-            >
-              Get started free
-            </Link>
-            <a
-              href="#pricing"
-              className="border border-gray-300 bg-white text-gray-700 px-8 py-4 rounded-lg font-medium hover:border-black text-lg"
-            >
-              See pricing
-            </a>
-          </div>
-          <p className="mt-4 text-sm text-gray-400">
-            Free for 5 clients · No credit card needed
-          </p>
-        </section>
-
-        {/* Features */}
-        <section className="max-w-5xl mx-auto px-6 pb-20">
-          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
-            Everything you need to stop chasing clients
-          </h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                title: 'Automatic reminders',
-                description:
-                  'Set it once and forget it. We send polite follow-up emails every few days until your client responds.',
-              },
-              {
-                title: 'Payments, approvals, files & more',
-                description:
-                  "Track anything you're waiting for — payments, approvals, files, replies, or contract signatures.",
-              },
-              {
-                title: 'Professional branding',
-                description:
-                  'Add your logo and business name so every reminder looks like it came from a real business.',
-              },
-            ].map((f) => (
-              <div key={f.title} className="bg-white border rounded-2xl p-6 shadow-sm">
-                <h3 className="font-semibold text-lg mb-2">{f.title}</h3>
-                <p className="text-gray-600 text-sm">{f.description}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Pricing (Moved down as Lomen suggested) */}
-        <section id="pricing" className="max-w-4xl mx-auto px-6 pb-20">
-          <h2 className="text-3xl font-bold text-center mb-3 text-gray-900">
-            Simple pricing
-          </h2>
-          <p className="text-center text-gray-600 mb-12">
-            Start free. Upgrade when you're ready.
-          </p>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Free */}
-            <div className="bg-white border rounded-2xl p-8 shadow-sm">
-              <h3 className="text-xl font-bold mb-2">Free</h3>
-              <div className="text-4xl font-bold mb-1">{freePrice}</div>
-              <p className="text-gray-500 text-sm mb-6">Forever</p>
-              <ul className="space-y-3 mb-8 text-sm">
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600">✓</span>
-                  Track up to 5 clients
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600">✓</span>
-                  Manual tracking dashboard
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600">✓</span>
-                  Export paid clients to CSV
-                </li>
-              </ul>
-              <Link
-                href="/login"
-                className="block text-center border border-gray-300 rounded-lg py-3 font-medium hover:border-black hover:bg-gray-50"
-              >
-                Get started
-              </Link>
+      <section className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 pb-20 pt-10 sm:px-8 sm:pb-28 sm:pt-16 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="relative z-10">
+          <p className="inline-flex items-center gap-2 rounded-full border border-emerald-900/10 bg-white px-3.5 py-2 text-xs font-bold text-emerald-900"><span className="h-2 w-2 rounded-full bg-emerald-500" />Built for appointments and customer orders</p>
+          <h1 className="mt-6 max-w-2xl text-5xl font-bold leading-[1.04] tracking-[-0.045em] sm:text-6xl lg:text-[4.35rem]">A booked slot should mean a <span className="text-emerald-700">real customer.</span></h1>
+          <p className="mt-6 max-w-xl text-base leading-7 text-slate-600 sm:text-lg">DueNudge helps salons, clinics, restaurants and other service businesses collect booking deposits, remind customers to show up, and invite past customers back.</p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row"><Link href="/login" className="rounded-xl bg-emerald-800 px-6 py-4 text-center text-sm font-bold text-white shadow-lg shadow-emerald-950/10 transition hover:-translate-y-0.5 hover:bg-emerald-900">Build my booking page <span aria-hidden="true">→</span></Link><a href="#how-it-works" className="rounded-xl border border-slate-300 bg-white px-6 py-4 text-center text-sm font-bold text-slate-800 hover:border-slate-500">See how it works</a></div>
+          <p className="mt-4 text-xs text-slate-500">Simple booking link. No customer account required.</p>
+        </div>
+        <div className="relative mx-auto w-full max-w-xl">
+          <div className="absolute -right-10 -top-12 h-52 w-52 rounded-full bg-amber-200/70 blur-3xl" />
+          <div className="absolute -bottom-8 -left-10 h-48 w-48 rounded-full bg-emerald-200/70 blur-3xl" />
+          <div className="relative rotate-1 rounded-[2rem] border border-slate-200 bg-white p-5 shadow-2xl shadow-slate-900/10 sm:p-7">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4"><div><p className="text-xs font-semibold text-slate-500">TODAY · YOUR BUSINESS</p><p className="mt-1 text-lg font-bold">Bookings at a glance</p></div><span className="rounded-full bg-emerald-50 px-3 py-1.5 text-[10px] font-bold text-emerald-800">LIVE VIEW</span></div>
+            <div className="mt-5 grid grid-cols-3 gap-3"><MiniStat label="Today" value="08" tone="green"/><MiniStat label="Deposits" value="₦24k" tone="dark"/><MiniStat label="At risk" value="02" tone="amber"/></div>
+            <div className="mt-5 space-y-3">
+              <div className="flex items-center gap-3 rounded-2xl bg-[#f7f7f2] p-4"><div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-emerald-100 text-sm font-bold text-emerald-800">10:30</div><div className="min-w-0 flex-1"><p className="truncate text-sm font-bold">Wash & style · Ada</p><p className="mt-1 text-xs text-slate-500">Deposit paid · reminder scheduled</p></div><span className="rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-bold text-emerald-800">Confirmed</span></div>
+              <div className="flex items-center gap-3 rounded-2xl bg-[#f7f7f2] p-4"><div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-amber-100 text-sm font-bold text-amber-900">12:00</div><div className="min-w-0 flex-1"><p className="truncate text-sm font-bold">Braids · Zainab</p><p className="mt-1 text-xs text-slate-500">Deposit due · booking request</p></div><span className="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold text-amber-900">Action</span></div>
             </div>
-
-            {/* Pro */}
-            <div className="bg-white border-2 border-blue-600 rounded-2xl p-8 relative shadow-md">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white text-xs font-medium px-3 py-1 rounded-full shadow-sm">
-                Most popular
-              </div>
-              <h3 className="text-xl font-bold mb-2">Pro</h3>
-              <div className="text-4xl font-bold mb-1">
-                {loading ? '...' : price}
-              </div>
-              <p className="text-gray-500 text-sm mb-6">per month</p>
-              <ul className="space-y-3 mb-8 text-sm">
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600">✓</span>
-                  Unlimited clients
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600">✓</span>
-                  Automatic email reminders
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600">✓</span>
-                  Logo + business name on reminders
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600">✓</span>
-                  Priority support
-                </li>
-              </ul>
-              
-              {currency === 'NGN' ? (
-                <Link
-                  href="/login"
-                  className="block text-center bg-blue-600 text-white rounded-lg py-3 font-medium hover:bg-blue-700 shadow-sm"
-                >
-                  Start free trial
-                </Link>
-              ) : (
-                <a
-                  href="mailto:tryclientping@gmail.com?subject=DueNudge%20Beta%20Access&body=Hi%2C%20I'd%20like%20early%20access%20to%20DueNudge%20Pro%20during%20the%20beta.%20Please%20add%20me."
-                  className="block text-center bg-blue-600 text-white rounded-lg py-3 font-medium hover:bg-blue-700 shadow-sm"
-                >
-                  Get free beta access
-                </a>
-              )}
-              
-              {currency === 'USD' && (
-                <p className="text-xs text-gray-500 mt-3 text-center">
-                  Pro launches soon. Email us for free access during the beta.
-                </p>
-              )}
-            </div>
+            <div className="mt-5 flex items-center justify-between rounded-2xl bg-emerald-950 p-4 text-white"><div><p className="text-xs text-emerald-200">A customer hasn’t visited in 30 days</p><p className="mt-1 text-sm font-bold">A gentle win-back is ready</p></div><span className="grid h-9 w-9 place-items-center rounded-full bg-white/10">↗</span></div>
+            <p className="mt-3 text-center text-[10px] text-slate-400">Illustrative product preview</p>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* FAQ */}
-        <section className="max-w-3xl mx-auto px-6 pb-20">
-          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
-            Common questions
-          </h2>
-          <div className="space-y-6">
-            {[
-              {
-                q: 'How do the automatic reminders work?',
-                a: "When you add a client, we schedule a series of polite email reminders. The first is friendly, then a bit firmer, and finally a professional final notice. You don't have to do anything - it just happens.",
-              },
-              {
-                q: 'Can I cancel anytime?',
-                a: 'Yes. No contracts. Cancel from your dashboard whenever you want. Your data stays accessible on the free plan.',
-              },
-              {
-                q: 'Do my clients need to sign up?',
-                a: 'No. Your clients just receive emails. They never have to create an account.',
-              },
-              {
-                q: 'Is my data secure?',
-                a: 'Yes. We use industry-standard encryption and your data is never shared with third parties.',
-              },
-            ].map((item) => (
-              <div key={item.q} className="bg-white border rounded-xl p-6 shadow-sm">
-                <h3 className="font-semibold mb-2">{item.q}</h3>
-                <p className="text-gray-600 text-sm">{item.a}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+      <section className="border-y border-slate-200 bg-white"><div className="mx-auto grid max-w-7xl gap-8 px-5 py-8 sm:px-8 md:grid-cols-[1fr_auto] md:items-center"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-800">The cost of an empty slot</p><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">See what missed bookings could mean for your business. This is an illustration using your own numbers—not an industry average.</p></div><div className="grid grid-cols-2 gap-3 sm:grid-cols-[120px_120px_1fr] sm:items-end"><label className="text-xs font-semibold text-slate-600">Value per slot<input inputMode="numeric" value={slotValue} onChange={(e) => setSlotValue(e.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm font-bold text-slate-950" /></label><label className="text-xs font-semibold text-slate-600">Missed slots / month<input inputMode="numeric" value={missedBookings} onChange={(e) => setMissedBookings(e.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm font-bold text-slate-950" /></label><div className="col-span-2 rounded-xl bg-amber-100 px-4 py-3 sm:col-span-1"><p className="text-[10px] font-bold uppercase tracking-wide text-amber-900">Potential revenue left on the table</p><p className="mt-0.5 text-xl font-black text-amber-950">{formattedLoss}</p></div></div></div></section>
 
-        {/* Contact */}
-        <section className="max-w-3xl mx-auto px-6 pb-20 text-center">
-          <h2 className="text-2xl font-bold mb-3">Questions? We're here.</h2>
-          <p className="text-gray-600 mb-6">
-            Reach out anytime. We reply within 24 hours.
-          </p>
-          <a
-            href="mailto:tryclientping@gmail.com"
-            className="inline-block bg-white border border-gray-300 text-black px-6 py-3 rounded-lg font-medium hover:border-black shadow-sm"
-          >
-            tryclientping@gmail.com
-          </a>
-        </section>
+      <section id="how-it-works" className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-24"><div className="max-w-2xl"><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-800">Small steps. Less chasing.</p><h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">Protect the booking before the customer walks in.</h2><p className="mt-4 leading-7 text-slate-600">A simple flow for businesses that take bookings, orders or site visits.</p></div><div className="mt-10 grid gap-4 md:grid-cols-3"><Feature number="01" title="Share your booking link" description="List your services and preferred deposit. Customers choose a time and leave their details on a simple page."/><Feature number="02" title="Secure the commitment" description="Collect a deposit routed to the business’s connected Paystack settlement account, so fake bookings take more than a tap."/><Feature number="03" title="Recover missed visits" description="Send an appointment reminder, follow up once after a no-show, then invite opted-in customers back when they have been away."/></div></section>
 
-        {/* Footer */}
-        <footer className="border-t bg-white">
-          <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
-            <div>© {new Date().getFullYear()} DueNudge. All rights reserved.</div>
-            <div className="flex gap-4">
-              <a href="mailto:tryclientping@gmail.com" className="hover:text-black">
-                Contact
-              </a>
-              <Link href="/login" className="hover:text-black">
-                Log in
-              </Link>
-            </div>
-          </div>
-        </footer>
-      </main>
-    </div>
+      <section id="businesses" className="bg-emerald-950 py-20 text-white sm:py-24"><div className="mx-auto max-w-7xl px-5 sm:px-8"><div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-300">Same leak. Different business.</p><h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">Built for the people whose time gets booked.</h2><p className="mt-4 max-w-lg leading-7 text-emerald-100/70">From a clinic chair to a Friday dinner table, one missed booking can waste more than the time it takes to send a reminder.</p></div><div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{industries.map((item,index) => <div key={item} className="rounded-xl border border-white/10 bg-white/[0.06] px-4 py-4 text-sm font-semibold text-emerald-50"><span className="mb-3 block text-xs font-bold text-emerald-300">0{index+1}</span>{item}</div>)}</div></div><div className="mt-14 grid gap-6 border-t border-white/10 pt-8 md:grid-cols-3"><div><p className="font-bold">For appointments</p><p className="mt-2 text-sm leading-6 text-emerald-100/70">Use deposits and reminders to reduce empty time on your calendar.</p></div><div><p className="font-bold">For made-to-order work</p><p className="mt-2 text-sm leading-6 text-emerald-100/70">Ask for a deposit before starting a custom order or arranging a site visit.</p></div><div><p className="font-bold">For repeat customers</p><p className="mt-2 text-sm leading-6 text-emerald-100/70">Reach out when a past customer has been away—only when they have opted in.</p></div></div></div></section>
+
+      <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-24"><div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-800">Questions, answered</p><h2 className="mt-3 text-3xl font-bold tracking-tight">Keep it clear for you and your customers.</h2></div><div className="space-y-3">{[
+        ['Who can use DueNudge?','Service businesses that take appointments, order requests or site visits—salons, clinics, dentists, restaurants, tailors, photographers, tutors, gyms and home renovators.'],
+        ['Where do customer deposits go?','Deposits are routed to the business’s Paystack subaccount and settlement bank. A business must verify and connect its own settlement account before online deposits can be accepted.'],
+        ['Do customers need an account?','No. They can use the business’s public booking page without creating a DueNudge account.'],
+        ['How do win-back messages work?','DueNudge can send a single, polite reactivation email after the business’s inactivity window, and only to customers who opted in to marketing updates.'],
+        ['Does a deposit guarantee a refund if plans change?','Cancellation and refund terms belong to the business. Customers should review those terms with the business before paying a deposit.'],
+      ].map(([question,answer]) => <details key={question} className="group rounded-2xl border border-slate-200 bg-white p-5"><summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-bold">{question}<span className="text-xl text-emerald-700 transition group-open:rotate-45">+</span></summary><p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">{answer}</p></details>)}</div></div></section>
+
+      <section className="px-5 pb-20 sm:px-8"><div className="mx-auto max-w-7xl rounded-[2rem] bg-emerald-100 px-6 py-12 text-center sm:px-12 sm:py-16"><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-900">Put your time back on the calendar</p><h2 className="mx-auto mt-3 max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl">Get fewer ghosts. More good customers.</h2><p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-emerald-950/70">Set up your business, list a service and share your booking page.</p><Link href="/login" className="mt-7 inline-flex rounded-xl bg-slate-950 px-6 py-4 text-sm font-bold text-white hover:bg-emerald-800">Start with DueNudge <span aria-hidden="true" className="ml-2">→</span></Link></div></section>
+
+      <footer className="border-t border-slate-200 bg-white"><div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-7 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-8"><span>© {new Date().getFullYear()} DueNudge. Less chasing. More confirmed work.</span><div className="flex gap-5"><a href="mailto:tryclientping@gmail.com" className="hover:text-slate-950">Contact</a><Link href="/login" className="hover:text-slate-950">Log in</Link></div></div></footer>
+    </main>
   )
 }
+
+function MiniStat({ label, value, tone }:{label:string;value:string;tone:'green'|'dark'|'amber'}) { const styles={green:'bg-emerald-50 text-emerald-950',dark:'bg-slate-950 text-white',amber:'bg-amber-100 text-amber-950'}; return <div className={`rounded-xl p-3 ${styles[tone]}`}><p className="text-[10px] font-semibold opacity-70">{label}</p><p className="mt-1 text-lg font-black">{value}</p></div> }
+function Feature({number,title,description}:{number:string;title:string;description:string}) { return <article className="rounded-2xl border border-slate-200 bg-white p-6"><p className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-100 text-xs font-black text-emerald-900">{number}</p><h3 className="mt-5 text-lg font-bold">{title}</h3><p className="mt-2 text-sm leading-6 text-slate-600">{description}</p></article> }

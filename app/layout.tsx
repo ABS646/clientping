@@ -5,9 +5,9 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'duenudge — Stop chasing clients. Get paid faster.',
+  title: 'DueNudge — Fewer no-shows. More confirmed work.',
   description:
-    'duenudge automatically follows up with your clients by email until they pay, reply, or approve.',
+    'DueNudge helps service businesses collect booking deposits, remind customers before appointments, and bring opted-in past customers back.',
 }
 
 export default function RootLayout({
