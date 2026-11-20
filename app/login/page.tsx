@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 
 export default function LoginPage() {
   const router = useRouter()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [mode, setMode] = useState<'login' | 'signup'>('login')
@@ -16,47 +16,70 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
 
-  // Check if they are already logged in when they visit the page
+  const googleAuthEnabled = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === 'true'
+
   useEffect(() => {
+    let active = true
     async function checkUser() {
       const { data: { session } } = await supabase.auth.getSession()
-      if (session) {
-        router.push('/dashboard')
-      } else {
-        setCheckingSession(false)
-      }
+      if (!active) return
+      if (session) router.replace('/dashboard')
+      else setCheckingSession(false)
     }
-    checkUser()
+    void checkUser()
+    return () => { active = false }
   }, [router, supabase])
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setLoading(true)
     setError('')
     setMessage('')
-
-    if (mode === 'login') {
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
-      if (error) {
-        setError(error.message)
-        setLoading(false)
-      } else {
+    try {
+      if (mode === 'login') {
+        const { error } = await supabase.auth.signInWithPassword({ email, password })
+        if (error) throw error
         router.push('/dashboard')
+        return
       }
-    } else {
-      const { error } = await supabase.auth.signUp({ email, password })
-      if (error) {
-        setError(error.message)
-        setLoading(false)
-      } else {
-        setMessage('Account created! Please check your email to confirm your address.')
-        setLoading(false)
-        setMode('login')
+
+      const callbackUrl = `${window.location.origin}/auth/callback?next=/dashboard`
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: callbackUrl },
+      })
+      if (error) throw error
+      if (data.session) {
+        router.push('/dashboard')
+        return
       }
+      setMessage('Account created. Check your inbox (and spam folder) for the confirmation link. It will return you to DueNudge after you confirm.')
+      setMode('login')
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : 'Something went wrong. Please try again.')
+    } finally {
+      setLoading(false)
     }
   }
 
-  // Show a loading state while we check if they are already logged in
+  async function handleGoogleSignIn() {
+    setLoading(true)
+    setError('')
+    setMessage('')
+    try {
+      const redirectTo = `${window.location.origin}/auth/callback?next=/dashboard`
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo },
+      })
+      if (error) throw error
+    } catch (signInError) {
+      setError(signInError instanceof Error ? signInError.message : 'Google sign-in could not be started.')
+      setLoading(false)
+    }
+  }
+
   if (checkingSession) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-400">
@@ -84,6 +107,22 @@ export default function LoginPage() {
               : 'Set up your business booking page'}
           </p>
 
+          {googleAuthEnabled && (
+            <>
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={loading}
+                className="w-full rounded-lg border border-gray-300 bg-white py-3 font-medium text-gray-800 hover:bg-gray-50 disabled:opacity-50"
+              >
+                Continue with Google
+              </button>
+              <div className="my-5 flex items-center gap-3 text-xs text-gray-400">
+                <span className="h-px flex-1 bg-gray-200" /><span>or use email</span><span className="h-px flex-1 bg-gray-200" />
+              </div>
+            </>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="email"
@@ -103,8 +142,8 @@ export default function LoginPage() {
               className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-blue-600 text-gray-900 bg-white placeholder:text-gray-400"
             />
 
-            {error && <p className="text-red-500 text-sm bg-red-50 p-2 rounded">{error}</p>}
-            {message && <p className="text-green-600 text-sm bg-green-50 p-2 rounded">{message}</p>}
+            {error && <p className="text-red-700 text-sm bg-red-50 p-2 rounded" role="alert">{error}</p>}
+            {message && <p className="text-green-700 text-sm bg-green-50 p-2 rounded" role="status">{message}</p>}
 
             <button
               type="submit"
