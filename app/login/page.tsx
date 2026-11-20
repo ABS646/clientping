@@ -80,8 +80,8 @@ export default function LoginPage() {
           </h1>
           <p className="text-gray-500 mb-6 text-sm">
             {mode === 'login'
-              ? 'Log in to manage your clients'
-              : 'Start tracking who owes you in 30 seconds'}
+              ? 'Log in to manage your bookings and customers'
+              : 'Set up your business booking page'}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">

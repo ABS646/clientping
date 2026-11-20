@@ -1,31 +1,26 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 
 export default function SettingsPage() {
   const router = useRouter()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
 
   const [userId, setUserId] = useState('')
-  const [email, setEmail] = useState('')
   const [businessName, setBusinessName] = useState('')
   const [logoUrl, setLogoUrl] = useState('')
   const [plan, setPlan] = useState('free')
 
   const [message, setMessage] = useState('')
 
-  useEffect(() => {
-    load()
-  }, [])
-
-  async function load() {
+  const load = useCallback(async function load() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
       router.push('/login')
@@ -33,8 +28,6 @@ export default function SettingsPage() {
     }
 
     setUserId(user.id)
-    setEmail(user.email || '')
-
     const { data } = await supabase
       .from('profiles')
       .select('business_name, logo_url, plan')
@@ -48,7 +41,12 @@ export default function SettingsPage() {
     }
 
     setLoading(false)
-  }
+  }, [router, supabase])
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => { void load() }, 0)
+    return () => window.clearTimeout(timer)
+  }, [load])
 
   async function saveBusinessName(e: React.FormEvent) {
     e.preventDefault()
