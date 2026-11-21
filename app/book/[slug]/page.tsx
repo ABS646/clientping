@@ -14,9 +14,17 @@ type Service = {
   currency: string
 }
 type Business = { business_name: string; industry: string; currency: string; can_accept_deposits: boolean; deposit_terms: string | null }
+type LocalPricing = { country: string; currency: string; rate: number; updatedAt: string | null; rateSource: string | null; locale: string }
 
-function money(value: number, currency: string) {
-  return new Intl.NumberFormat('en-NG', { style: 'currency', currency: currency || 'NGN', maximumFractionDigits: 0 }).format(value || 0)
+function money(value: number, currency: string, locale = 'en') {
+  return new Intl.NumberFormat(locale, { style: 'currency', currency: currency || 'NGN', maximumFractionDigits: currency === 'NGN' ? 0 : 2 }).format(value || 0)
+}
+
+function priceLabel(value: number, baseCurrency: string, pricing: LocalPricing | null, locale: string) {
+  if (pricing && pricing.currency !== baseCurrency && pricing.rate > 0) {
+    return `≈ ${money(value * pricing.rate, pricing.currency, locale)} · ${money(value, baseCurrency, locale)}`
+  }
+  return money(value, baseCurrency, locale)
 }
 
 export default function PublicBookingPage() {
@@ -24,6 +32,8 @@ export default function PublicBookingPage() {
   const searchParams = useSearchParams()
   const slug = params.slug
   const [business, setBusiness] = useState<Business | null>(null)
+  const [localPricing, setLocalPricing] = useState<LocalPricing | null>(null)
+  const [pricingLoading, setPricingLoading] = useState(true)
   const [services, setServices] = useState<Service[]>([])
   const [serviceId, setServiceId] = useState('')
   const [name, setName] = useState('')
@@ -55,7 +65,20 @@ export default function PublicBookingPage() {
       .finally(() => setLoading(false))
   }, [slug])
 
+  useEffect(() => {
+    fetch('/api/local-pricing')
+      .then(async (response) => {
+        if (!response.ok) return null
+        return await response.json() as LocalPricing
+      })
+      .then((pricing) => { if (pricing) setLocalPricing(pricing) })
+      .catch(() => setLocalPricing(null))
+      .finally(() => setPricingLoading(false))
+  }, [])
+
   const selected = services.find((service) => service.id === serviceId)
+  const visitorLocale = localPricing?.locale || 'en'
+  const hasLocalEstimate = Boolean(selected && localPricing && localPricing.currency !== selected.currency && localPricing.rate > 0)
   const paid = searchParams.get('reference') || searchParams.get('trxref')
   const verifyingPayment = Boolean(paid) && verifiedReference !== paid && !error
 
@@ -104,7 +127,7 @@ export default function PublicBookingPage() {
     }
   }
 
-  if (loading) return <main className="min-h-screen grid place-items-center bg-[#f7f7f2] text-slate-500">Loading booking page…</main>
+  if (loading || pricingLoading) return <main className="min-h-screen grid place-items-center bg-[#f7f7f2] text-slate-500">Loading booking page…</main>
   if (error && !business) return <main className="min-h-screen grid place-items-center bg-[#f7f7f2] px-6 text-center"><div><p className="text-xl font-semibold text-slate-900">Booking page unavailable</p><p className="mt-2 text-slate-600">{error}</p><Link className="mt-5 inline-block text-sm font-semibold text-emerald-700" href="/">DueNudge</Link></div></main>
 
   return (
@@ -136,10 +159,10 @@ export default function PublicBookingPage() {
                 </label>
                 <label className="block text-sm font-semibold text-slate-800">Service
                   <select required value={serviceId} onChange={(e) => setServiceId(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900">
-                    {services.map((service) => <option key={service.id} value={service.id}>{service.name} · {money(Number(service.price), service.currency)}</option>)}
+                    {services.map((service) => <option key={service.id} value={service.id}>{service.name} · {priceLabel(Number(service.price), service.currency, localPricing, visitorLocale)}</option>)}
                   </select>
                 </label>
-                {selected && <div className="rounded-xl bg-[#f4f7f0] p-4 text-sm text-slate-700">{selected.description && <p>{selected.description}</p>}<p className="mt-1">{selected.duration_minutes} minutes{Number(selected.deposit_amount) > 0 ? ` · ${money(Number(selected.deposit_amount), selected.currency)} deposit to hold your spot` : ' · No deposit required'}</p></div>}
+                {selected && <div className="rounded-xl bg-[#f4f7f0] p-4 text-sm text-slate-700">{selected.description && <p>{selected.description}</p>}<p className="mt-1">{selected.duration_minutes} minutes</p><p className="mt-2 font-semibold">Service price: {priceLabel(Number(selected.price), selected.currency, localPricing, visitorLocale)}</p><p className="mt-1">{Number(selected.deposit_amount) > 0 ? `Deposit to request this booking: ${priceLabel(Number(selected.deposit_amount), selected.currency, localPricing, visitorLocale)}` : 'No online deposit required'}</p></div>}
                 <div className="grid gap-4 sm:grid-cols-2">
                   <label className="block text-sm font-semibold text-slate-800">Date<input required type="date" min={new Date().toISOString().slice(0, 10)} value={date} onChange={(e) => setDate(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 font-normal text-slate-900" /></label>
                   <label className="block text-sm font-semibold text-slate-800">Time<input required type="time" value={time} onChange={(e) => setTime(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 font-normal text-slate-900" /></label>
@@ -154,7 +177,9 @@ export default function PublicBookingPage() {
                 {selected && Number(selected.deposit_amount) > 0 && business?.deposit_terms && <div className="rounded-xl border border-amber-200 bg-amber-50 p-4"><p className="text-xs font-bold uppercase tracking-wide text-amber-950">Deposit & cancellation terms</p><p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-amber-950">{business.deposit_terms}</p><label className="mt-3 flex items-start gap-3 text-xs leading-5 text-amber-950"><input type="checkbox" required checked={termsAccepted} onChange={(e) => setTermsAccepted(e.target.checked)} className="mt-1" />I have read and agree to these terms for my deposit.</label></div>}
                 {selected && Number(selected.deposit_amount) > 0 && !business?.can_accept_deposits && <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-950">This business is still completing its settlement setup. Please contact them directly before paying a deposit.</p>}
                 {error && <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
-                <button disabled={submitting || !selected || (Number(selected.deposit_amount) > 0 && (!business?.can_accept_deposits || !termsAccepted))} className="w-full rounded-xl bg-slate-950 px-5 py-4 text-sm font-bold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50">{submitting ? 'Saving your booking…' : selected && Number(selected.deposit_amount) > 0 ? `Pay deposit · ${money(Number(selected.deposit_amount), selected.currency)}` : 'Send booking request'}</button>
+                <button disabled={submitting || !selected || (Number(selected.deposit_amount) > 0 && (!business?.can_accept_deposits || !termsAccepted))} className="w-full rounded-xl bg-slate-950 px-5 py-4 text-sm font-bold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50">{submitting ? 'Saving your booking…' : selected && Number(selected.deposit_amount) > 0 ? hasLocalEstimate ? `Pay ≈ ${money(Number(selected.deposit_amount) * (localPricing?.rate || 1), localPricing?.currency || selected.currency, visitorLocale)} · NGN ${money(Number(selected.deposit_amount), selected.currency, 'en-NG')}` : `Pay deposit · ${money(Number(selected.deposit_amount), selected.currency, visitorLocale)}` : 'Send booking request'}</button>
+                {selected && Number(selected.deposit_amount) > 0 && <p className="text-center text-xs leading-5 text-slate-600">Paystack will charge <strong>{money(Number(selected.deposit_amount), selected.currency, visitorLocale)} in {selected.currency}</strong>. The local-currency amount is only an estimate; Paystack checkout shows the actual charge currency and your card issuer may apply its own exchange rate or fees.</p>}
+                {hasLocalEstimate && localPricing?.rateSource && <p className="text-center text-[11px] leading-5 text-slate-500">Indicative daily exchange rate{localPricing.updatedAt ? ` updated ${new Date(localPricing.updatedAt).toLocaleDateString(visitorLocale)}` : ''}. <a href="https://www.exchangerate-api.com" target="_blank" rel="noreferrer" className="underline">Rates by Exchange Rate API</a></p>}
                 <p className="text-center text-xs leading-5 text-slate-500">Your selected date and time are a request. The business will confirm availability. The deposit is routed to the business’s Paystack settlement account, not DueNudge.</p>
               </form>
             </>
